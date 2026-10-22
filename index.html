@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101114">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FitTrack">
+  <meta name="description" content="Личный трекер тренировок с историей подходов и прогрессом.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <title>FitTrack — тренировки</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-mark">F</div>
+      <div class="brand-copy"><div class="eyebrow">ЛИЧНЫЙ ТРЕКЕР</div><h1>FitTrack</h1></div>
+      <button class="icon-button" id="installHelp" aria-label="Как установить" title="Как установить">＋</button>
+    </header>
+
+    <main>
+      <section class="view active" id="view-home">
+        <div class="greeting">
+          <div><p class="eyebrow">ТВОЙ ПЛАН</p><h2>Становись сильнее.</h2><p class="muted">Регулярность важнее рекордов.</p></div>
+          <div class="streak-chip"><span class="pulse"></span><span id="weekCount">0</span><small>за неделю</small></div>
+        </div>
+        <div class="next-card">
+          <div class="next-top"><span class="eyebrow">СЛЕДУЮЩАЯ ТРЕНИРОВКА</span><span class="tag" id="nextDayTag">ПОНЕДЕЛЬНИК</span></div>
+          <h3 id="nextWorkoutTitle">Тренировка A</h3>
+          <p id="nextWorkoutSubtitle" class="muted">Жимовые движения · 5 упражнений</p>
+          <button class="primary-button full" id="startNext">Начать тренировку <span>→</span></button>
+        </div>
+        <div class="section-heading"><h3>Твой план</h3><span class="muted small">3 раза в неделю</span></div>
+        <div class="workout-list" id="homeWorkoutList"></div>
+        <div class="section-heading"><h3>Быстрая статистика</h3><button class="text-button" data-nav="progress">Подробнее</button></div>
+        <div class="stats-grid">
+          <div class="stat-card"><span class="muted small">Тренировок</span><strong id="totalWorkouts">0</strong><span class="stat-note">всего завершено</span></div>
+          <div class="stat-card"><span class="muted small">Вес тела</span><strong id="latestBodyWeight">—</strong><span class="stat-note" id="bodyWeightChange">добавь первое измерение</span></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-workout">
+        <div class="page-heading">
+          <button class="back-button" data-nav="home">←</button>
+          <div><p class="eyebrow" id="activeWorkoutDay">ТРЕНИРОВКА</p><h2 id="activeWorkoutTitle">Тренировка A</h2></div>
+          <span class="tag" id="exerciseCounter">0 / 5</span>
+        </div>
+        <div class="workout-progress"><div id="workoutProgressBar"></div></div>
+        <div id="activeExerciseList" class="exercise-list"></div>
+        <div class="finish-area"><button class="primary-button full" id="finishWorkout">Завершить тренировку</button><p class="muted tiny">Прогресс сохраняется на этом устройстве.</p></div>
+      </section>
+
+      <section class="view" id="view-history">
+        <div class="page-heading"><div><p class="eyebrow">ТВОЯ РАБОТА</p><h2>История</h2></div></div>
+        <div class="segmented"><button class="segment active" data-history-tab="sessions">Тренировки</button><button class="segment" data-history-tab="weights">Вес тела</button></div>
+        <div id="historySessions"></div>
+        <div id="historyWeights" class="hidden"></div>
+      </section>
+
+      <section class="view" id="view-progress">
+        <div class="page-heading"><div><p class="eyebrow">МАЛЕНЬКИЕ ШАГИ</p><h2>Прогресс</h2></div></div>
+        <div class="panel">
+          <div class="panel-heading"><div><h3>Вес тела</h3><p class="muted small">Изменения по измерениям</p></div><span class="chart-dot"></span></div>
+          <div id="bodyWeightChart" class="chart-wrap"><div class="empty-state">Добавь несколько измерений веса, чтобы увидеть график.</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading"><div><h3>Рабочие веса</h3><p class="muted small">Выбери упражнение</p></div></div>
+          <select id="exerciseHistorySelect" class="select-input"></select>
+          <div id="exerciseChart" class="chart-wrap"><div class="empty-state">Заверши подходы с указанным весом — здесь появится история.</div></div>
+        </div>
+        <div class="panel safety-panel"><span class="safety-icon">↗</span><div><h3>Прогресс без спешки</h3><p class="muted small">Когда выполняешь верхнюю границу повторений во всех подходах с чистой техникой, увеличивай вес на минимальный шаг. Не тренируйся через боль.</p></div></div>
+      </section>
+
+      <section class="view" id="view-profile">
+        <div class="page-heading"><div><p class="eyebrow">НАСТРОЙКИ</p><h2>Профиль</h2></div></div>
+        <div class="panel">
+          <h3>Вес тела</h3><p class="muted small">Записывай измерения примерно в одинаковых условиях, например утром.</p>
+          <form id="bodyWeightForm" class="weight-form">
+            <label for="bodyWeightInput">Вес, кг</label>
+            <div class="form-row"><input id="bodyWeightInput" class="number-input" type="number" min="20" max="350" step="0.1" placeholder="Например, 60.0" required><button class="primary-button" type="submit">Сохранить</button></div>
+          </form>
+          <p class="muted tiny" id="weightSaveStatus" aria-live="polite"></p>
+        </div>
+        <div class="panel">
+          <h3>Данные и резервная копия</h3>
+          <p class="muted small">Все записи хранятся в браузере на этом устройстве. Экспортируй копию перед очисткой данных или переносом на другой телефон.</p>
+          <div class="button-stack"><button class="secondary-button full" id="exportData">Экспортировать резервную копию</button><label class="secondary-button full file-label">Импортировать копию<input type="file" id="importData" accept="application/json"></label><button class="danger-button full" id="clearData">Удалить все данные</button></div>
+        </div>
+        <div class="panel">
+          <h3>О приложении</h3>
+          <p class="muted small">FitTrack — локальный PWA-трекер. Интернет нужен для первого открытия и установки; при корректном размещении приложение может открываться офлайн.</p>
+          <button class="secondary-button full" id="showInstallGuide">Как добавить на экран «Домой»</button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="tabbar" aria-label="Основная навигация">
+      <button class="tab active" data-nav="home"><span class="tab-icon">⌂</span><span>Главная</span></button>
+      <button class="tab" data-nav="workout"><span class="tab-icon">▤</span><span>Тренировка</span></button>
+      <button class="tab" data-nav="history"><span class="tab-icon">◷</span><span>История</span></button>
+      <button class="tab" data-nav="progress"><span class="tab-icon">↗</span><span>Прогресс</span></button>
+      <button class="tab" data-nav="profile"><span class="tab-icon">☻</span><span>Профиль</span></button>
+    </nav>
+  </div>
+
+  <dialog id="exerciseDialog" class="modal">
+    <div class="modal-header"><div><p class="eyebrow">ТЕХНИКА</p><h2 id="dialogExerciseTitle">Упражнение</h2></div><button class="icon-button" id="closeExerciseDialog" aria-label="Закрыть">×</button></div>
+    <div id="dialogExerciseBody" class="modal-body"></div>
+  </dialog>
+
+  <dialog id="timerDialog" class="modal timer-modal">
+    <div class="modal-header"><div><p class="eyebrow">ВОССТАНОВЛЕНИЕ</p><h2>Отдых между подходами</h2></div><button class="icon-button" id="closeTimer" aria-label="Закрыть">×</button></div>
+    <div class="timer-display" id="timerDisplay">01:30</div>
+    <div class="timer-presets"><button data-seconds="60">60 сек</button><button class="active" data-seconds="90">90 сек</button><button data-seconds="120">120 сек</button></div>
+    <div class="timer-controls"><button class="secondary-button" id="timerReset">Сбросить</button><button class="primary-button" id="timerStartPause">Старт</button></div>
+    <p class="muted small centered">Не задерживай дыхание во время упражнений.</p>
+  </dialog>
+
+  <dialog id="installDialog" class="modal">
+    <div class="modal-header"><div><p class="eyebrow">УСТАНОВКА</p><h2>На экран «Домой»</h2></div><button class="icon-button" id="closeInstall" aria-label="Закрыть">×</button></div>
+    <div class="modal-body"><ol class="guide-list"><li>Открой адрес приложения в <strong>Safari</strong> на iPhone.</li><li>Нажми кнопку <strong>«Поделиться»</strong> — квадрат со стрелкой вверх.</li><li>Выбери <strong>«На экран Домой»</strong>. Если пункта нет, прокрути список действий вниз.</li><li>Нажми <strong>«Добавить»</strong>. Запускай FitTrack с новой иконки.</li></ol><p class="muted small">Для установки сайт должен быть размещён по HTTPS. Данные сохраняются локально в браузере; не очищай данные сайта без резервной копии.</p></div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js"></script>
+</body>
+</html>
