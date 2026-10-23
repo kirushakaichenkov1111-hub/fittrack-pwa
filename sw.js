@@ -75,7 +75,7 @@ self.addEventListener("fetch", event => {
 
   const isAppShell =
     request.mode === "navigate" ||
-    /\\/(index\\.html|app\\.js|styles\\.css|sw\\.js)$/.test(url.pathname);
+    ["index.html", "app.js", "styles.css", "sw.js"].some(file => url.pathname.endsWith("/" + file));
 
   event.respondWith((async () => {
     if (isAppShell) {
