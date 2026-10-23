@@ -1,131 +1,77 @@
-<!doctype html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#101114">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="FitTrack">
-  <meta name="description" content="Личный трекер тренировок с историей подходов и прогрессом.">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./styles.css">
-  <title>FitTrack — тренировки</title>
-</head>
-<body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="brand-mark">F</div>
-      <div class="brand-copy"><div class="eyebrow">ЛИЧНЫЙ ТРЕКЕР</div><h1>FitTrack</h1></div>
-      <button class="icon-button" id="installHelp" aria-label="Как установить" title="Как установить">＋</button>
-    </header>
+const STORAGE_KEY = "fittrack-v1";
+const workouts = [
+ {id:"A",day:"ПОНЕДЕЛЬНИК",title:"Тренировка A",subtitle:"Жимовые движения",focus:"Грудь · плечи · трицепс · ноги",exercises:[
+  {id:"pec-fly",name:"Сведение рук в тренажёре («бабочка»)",sets:2,reps:"10–12",rest:90,startWeight:"10–15 кг",image:"pec-fly.jpg",tech:"Настрой сиденье так, чтобы локти были примерно на уровне груди. Прижми спину к спинке, своди рукояти перед собой без рывка, не сталкивая их с усилием. Медленно вернись в исходное положение.",muscles:"Грудные мышцы"},
+  {id:"leg-extension",name:"Разгибание ног в тренажёре",sets:3,reps:"10–15",rest:90,image:"leg-extension.jpg",startWeight:"10–20 кг",tech:"Совмести колени с осью вращения тренажёра. Поднимай валик разгибанием коленей без рывка. Опускай вес плавно и не бросай его в нижней точке.",muscles:"Квадрицепсы"},
+  {id:"reverse-lunge",name:"Выпады назад",sets:2,reps:"8–10 на ногу",rest:90,startWeight:"сначала без веса; затем 2–4 кг на руку",image:"reverse-lunge.jpg",tech:"Начни с выпадов назад без гантелей, держась рядом с опорой при необходимости. Сделай шаг назад и опускайся только в комфортной амплитуде. Сохраняй устойчивый корпус и колено передней ноги направленным по линии стопы. Добавляй гантели только если движение безболезненно и устойчиво.",muscles:"Квадрицепсы, ягодичные мышцы"},
+  {id:"lateral-raise",name:"Махи гантелями в стороны",sets:2,reps:"12–15",rest:75,startWeight:"2–4 кг на руку",image:"lateral-raise.jpg",tech:"Возьми лёгкие гантели, слегка согни локти. Поднимай руки в стороны примерно до уровня плеч, не раскачивай корпус и не пожимай плечами.",muscles:"Средняя часть дельтовидных мышц"},
+  {id:"leg-curl",name:"Сгибание ног лёжа",sets:2,reps:"10–15",rest:90,startWeight:"10–15 кг",image:"leg-curl.jpg",tech:"Расположи колени у оси тренажёра и таз на скамье. Сгибай ноги плавно, не поднимай таз и не прогибай поясницу.",muscles:"Задняя поверхность бедра"},
+  {id:"triceps-pushdown",name:"Разгибание рук на верхнем блоке",sets:2,reps:"10–15",rest:75,image:"triceps-pushdown.jpg",startWeight:"5–10 кг",tech:"Держи локти возле корпуса. Разгибай руки, двигая преимущественно предплечьями. Не наклоняйся всем телом на вес.",muscles:"Трицепс"}
+ ]},
+ {id:"B",day:"СРЕДА",title:"Тренировка B",subtitle:"Тяговые движения",focus:"Спина · бицепс · задняя поверхность ног",exercises:[
+  {id:"lat-pulldown",name:"Тяга верхнего блока к груди",sets:3,reps:"8–12",rest:120,image:"lat-pulldown.jpg",startWeight:"15–25 кг",tech:"Зафиксируй бёдра под валиками. Сохраняя комфортное нейтральное положение спины, тяни рукоять к верхней части груди, направляя локти вниз. Не тяни за голову и не раскачивайся.",muscles:"Широчайшие мышцы спины, бицепс"},
+  {id:"chest-row",name:"Тяга с упором грудью",sets:3,reps:"8–12",rest:120,image:"chest-row.jpg",startWeight:"10–20 кг",tech:"Упрись грудью в подушку. Тяни рукояти к нижним рёбрам, сводя лопатки. Не отрывай грудь от опоры и не дёргай вес.",muscles:"Средняя часть спины, широчайшие, задняя дельта"},
+  {id:"leg-curl",name:"Сгибание ног лёжа",sets:2,reps:"10–15",rest:90,startWeight:"10–15 кг",image:"leg-curl.jpg",tech:"Таз остаётся на скамье. Сгибай колени плавно и возвращай валик под контролем, не поднимая поясницу.",muscles:"Задняя поверхность бедра"},
+  {id:"biceps-curl-machine",name:"Сгибание рук на бицепс в тренажёре",sets:2,reps:"10–15",rest:75,image:"biceps-curl-machine.jpg",startWeight:"5–10 кг",tech:"Прижми плечи к опоре. Сгибай руки без движения локтей вперёд. Опускай вес медленно, не распрямляя локти резко.",muscles:"Бицепс"},
+  {id:"biceps-curl-cable",name:"Сгибание рук на нижнем блоке",sets:2,reps:"10–15",rest:75,image:"cable-biceps-curl.jpg",startWeight:"5–10 кг на блоке (ориентировочно)",tech:"Прикрепи прямую или EZ-рукоять к нижнему блоку. Встань прямо, стопы примерно на ширине плеч, колени слегка согнуты. Держи локти возле корпуса и плечи неподвижными. Сгибай руки, поднимая рукоять к груди, затем медленно опускай её под контролем. Не раскачивай корпус и не поднимай локти вперёд.",muscles:"Бицепс и другие сгибатели локтя"},
+  {id:"reverse-fly",name:"Обратная бабочка",sets:2,reps:"12–15",rest:75,image:"reverse-fly.jpg",startWeight:"5–10 кг",tech:"Грудь держи у опоры. Разводи руки в стороны, нагружая заднюю часть плеч. Не пожимай плечами и не используй инерцию.",muscles:"Задняя часть плеч, верх спины"}
+ ]},
+ {id:"C",day:"ПЯТНИЦА",title:"Тренировка C",subtitle:"Верх тела и дополнительные упражнения",focus:"Грудь · спина · икры · руки",exercises:[
+  {id:"incline-press",name:"Наклонный жим в тренажёре",sets:3,reps:"8–12",rest:120,image:"incline-press.jpg",startWeight:"5–10 кг на сторону или минимальный вес",tech:"Настрой спинку под умеренным наклоном. Держи спину у опоры и стопы на полу. Выжимай вес без рывков; не прогибай поясницу ради дополнительной амплитуды.",muscles:"Верхняя часть груди, передние дельты, трицепс"},
+  {id:"lat-pulldown-neutral",name:"Тяга верхнего блока нейтральным хватом",sets:3,reps:"8–12",rest:120,image:"lat-pulldown-neutral.jpg",startWeight:"15–25 кг",tech:"Используй нейтральную рукоять, если она есть. Тяни локти вниз, не раскачивая корпус. Сохраняй контроль на обратной фазе.",muscles:"Широчайшие мышцы спины, бицепс"},
+  {id:"calf-raise",name:"Подъёмы на носки сидя",sets:3,reps:"12–20",rest:75,image:"calf-raise.jpg",startWeight:"10–20 кг",tech:"Поднимай пятки в комфортной амплитуде, задержись наверху на секунду и медленно опускай. Не пружинь в нижней точке.",muscles:"Икроножная и камбаловидная мышцы"},
+  {id:"hip-abduction",name:"Разведение бёдер в тренажёре",sets:2,reps:"12–15",rest:75,image:"hip-abduction.jpg",startWeight:"10–20 кг",tech:"Сохраняй таз неподвижным и спину у опоры. Разводи колени плавно, без раскачивания и чрезмерного веса.",muscles:"Средняя ягодичная мышца и мышцы-стабилизаторы таза"},
+  {id:"biceps-curl-dumbbell",name:"Сгибание рук с гантелями",sets:2,reps:"10–15",rest:75,image:"biceps-curl-dumbbell.jpg",startWeight:"5–10 кг",tech:"Держи локти стабильно. Не раскачивай корпус и опускай вес медленно, сохраняя контроль.",muscles:"Бицепс"},
+  {id:"biceps-curl-incline",name:"Сгибание рук с гантелями на наклонной скамье",sets:3,reps:"10–12",rest:75,image:"incline-dumbbell-curl.jpg",startWeight:"4–6 кг на каждую руку",tech:"Установи спинку скамьи под углом примерно 45–60°. Сядь, прижми спину и плечи к спинке, руки опусти вниз, не выводя локти вперёд. Сгибай руки без раскачивания корпуса и без движения плеч. Опускай гантели медленно, сохраняя контроль и не переразгибая локти.",muscles:"Бицепс, особенно длинная головка"},
+  {id:"triceps-pushdown",name:"Разгибание рук на блоке",sets:2,reps:"10–15",rest:75,image:"triceps-pushdown.jpg",startWeight:"5–10 кг",tech:"Локти держи близко к туловищу. Разгибай руки без рывков и без движения плечами.",muscles:"Трицепс"}
+ ]}
+];
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const todayISO = () => new Date().toISOString().slice(0,10);
+const fmtDate = value => new Date(value+"T12:00:00").toLocaleDateString("ru-RU",{day:"numeric",month:"short",year:"numeric"});
+const escapeHTML = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let state = loadState();
+let activeWorkoutId = null;
+let activeSession = null;
+let timerSeconds = 90;
+let timerRemaining = 90;
+let timerInterval = null;
+let timerRunning = false;
+let toastTimeout = null;
 
-    <main>
-      <section class="view active" id="view-home">
-        <div class="greeting">
-          <div><p class="eyebrow">ТВОЙ ПЛАН</p><h2>Становись сильнее.</h2><p class="muted">Регулярность важнее рекордов.</p></div>
-          <div class="streak-chip"><span class="pulse"></span><span id="weekCount">0</span><small>за неделю</small></div>
-        </div>
-        <div class="next-card">
-          <div class="next-top"><span class="eyebrow">СЛЕДУЮЩАЯ ТРЕНИРОВКА</span><span class="tag" id="nextDayTag">ПОНЕДЕЛЬНИК</span></div>
-          <h3 id="nextWorkoutTitle">Тренировка A</h3>
-          <p id="nextWorkoutSubtitle" class="muted">Жимовые движения · 5 упражнений</p>
-          <button class="primary-button full" id="startNext">Начать тренировку <span>→</span></button>
-        </div>
-        <div class="section-heading"><h3>Твой план</h3><span class="muted small">3 раза в неделю</span></div>
-        <div class="workout-list" id="homeWorkoutList"></div>
-        <div class="section-heading"><h3>Быстрая статистика</h3><button class="text-button" data-nav="progress">Подробнее</button></div>
-        <div class="stats-grid">
-          <div class="stat-card"><span class="muted small">Тренировок</span><strong id="totalWorkouts">0</strong><span class="stat-note">всего завершено</span></div>
-          <div class="stat-card"><span class="muted small">Вес тела</span><strong id="latestBodyWeight">—</strong><span class="stat-note" id="bodyWeightChange">добавь первое измерение</span></div>
-        </div>
-      </section>
-
-      <section class="view" id="view-workout">
-        <div class="page-heading">
-          <button class="back-button" data-nav="home">←</button>
-          <div><p class="eyebrow" id="activeWorkoutDay">ТРЕНИРОВКА</p><h2 id="activeWorkoutTitle">Тренировка A</h2></div>
-          <span class="tag" id="exerciseCounter">0 / 5</span>
-        </div>
-        <div class="workout-progress"><div id="workoutProgressBar"></div></div>
-        <div id="activeExerciseList" class="exercise-list"></div>
-        <div class="finish-area"><button class="primary-button full" id="finishWorkout">Завершить тренировку</button><p class="muted tiny">Прогресс сохраняется на этом устройстве.</p></div>
-      </section>
-
-      <section class="view" id="view-history">
-        <div class="page-heading"><div><p class="eyebrow">ТВОЯ РАБОТА</p><h2>История</h2></div></div>
-        <div class="segmented"><button class="segment active" data-history-tab="sessions">Тренировки</button><button class="segment" data-history-tab="weights">Вес тела</button></div>
-        <div id="historySessions"></div>
-        <div id="historyWeights" class="hidden"></div>
-      </section>
-
-      <section class="view" id="view-progress">
-        <div class="page-heading"><div><p class="eyebrow">МАЛЕНЬКИЕ ШАГИ</p><h2>Прогресс</h2></div></div>
-        <div class="panel">
-          <div class="panel-heading"><div><h3>Вес тела</h3><p class="muted small">Изменения по измерениям</p></div><span class="chart-dot"></span></div>
-          <div id="bodyWeightChart" class="chart-wrap"><div class="empty-state">Добавь несколько измерений веса, чтобы увидеть график.</div></div>
-        </div>
-        <div class="panel">
-          <div class="panel-heading"><div><h3>Рабочие веса</h3><p class="muted small">Выбери упражнение</p></div></div>
-          <select id="exerciseHistorySelect" class="select-input"></select>
-          <div id="exerciseChart" class="chart-wrap"><div class="empty-state">Заверши подходы с указанным весом — здесь появится история.</div></div>
-        </div>
-        <div class="panel safety-panel"><span class="safety-icon">↗</span><div><h3>Прогресс без спешки</h3><p class="muted small">Когда выполняешь верхнюю границу повторений во всех подходах с чистой техникой, увеличивай вес на минимальный шаг. Не тренируйся через боль.</p></div></div>
-      </section>
-
-      <section class="view" id="view-profile">
-        <div class="page-heading"><div><p class="eyebrow">НАСТРОЙКИ</p><h2>Профиль</h2></div></div>
-        <div class="panel">
-          <h3>Вес тела</h3><p class="muted small">Записывай измерения примерно в одинаковых условиях, например утром.</p>
-          <form id="bodyWeightForm" class="weight-form">
-            <label for="bodyWeightInput">Вес, кг</label>
-            <div class="form-row"><input id="bodyWeightInput" class="number-input" type="number" min="20" max="350" step="0.1" placeholder="Например, 60.0" required><button class="primary-button" type="submit">Сохранить</button></div>
-          </form>
-          <p class="muted tiny" id="weightSaveStatus" aria-live="polite"></p>
-        </div>
-        <div class="panel">
-          <h3>Данные и резервная копия</h3>
-          <p class="muted small">Все записи хранятся в браузере на этом устройстве. Экспортируй копию перед очисткой данных или переносом на другой телефон.</p>
-          <div class="button-stack"><button class="secondary-button full" id="exportData">Экспортировать резервную копию</button><label class="secondary-button full file-label">Импортировать копию<input type="file" id="importData" accept="application/json"></label><button class="danger-button full" id="clearData">Удалить все данные</button></div>
-        </div>
-        <div class="panel">
-          <h3>О приложении</h3>
-          <p class="muted small">FitTrack — локальный PWA-трекер. Интернет нужен для первого открытия и установки; при корректном размещении приложение может открываться офлайн.</p>
-          <button class="secondary-button full" id="showInstallGuide">Как добавить на экран «Домой»</button>
-        </div>
-      </section>
-    </main>
-
-    <nav class="tabbar" aria-label="Основная навигация">
-      <button class="tab active" data-nav="home"><span class="tab-icon">⌂</span><span>Главная</span></button>
-      <button class="tab" data-nav="workout"><span class="tab-icon">▤</span><span>Тренировка</span></button>
-      <button class="tab" data-nav="history"><span class="tab-icon">◷</span><span>История</span></button>
-      <button class="tab" data-nav="progress"><span class="tab-icon">↗</span><span>Прогресс</span></button>
-      <button class="tab" data-nav="profile"><span class="tab-icon">☻</span><span>Профиль</span></button>
-    </nav>
-  </div>
-
-  <dialog id="exerciseDialog" class="modal">
-    <div class="modal-header"><div><p class="eyebrow">ТЕХНИКА</p><h2 id="dialogExerciseTitle">Упражнение</h2></div><button class="icon-button" id="closeExerciseDialog" aria-label="Закрыть">×</button></div>
-    <div id="dialogExerciseBody" class="modal-body"></div>
-  </dialog>
-
-  <dialog id="timerDialog" class="modal timer-modal">
-    <div class="modal-header"><div><p class="eyebrow">ВОССТАНОВЛЕНИЕ</p><h2>Отдых между подходами</h2></div><button class="icon-button" id="closeTimer" aria-label="Закрыть">×</button></div>
-    <div class="timer-display" id="timerDisplay">01:30</div>
-    <div class="timer-presets"><button data-seconds="60">60 сек</button><button class="active" data-seconds="90">90 сек</button><button data-seconds="120">120 сек</button></div>
-    <div class="timer-controls"><button class="secondary-button" id="timerReset">Сбросить</button><button class="primary-button" id="timerStartPause">Старт</button></div>
-    <p class="muted small centered">Не задерживай дыхание во время упражнений.</p>
-  </dialog>
-
-  <dialog id="installDialog" class="modal">
-    <div class="modal-header"><div><p class="eyebrow">УСТАНОВКА</p><h2>На экран «Домой»</h2></div><button class="icon-button" id="closeInstall" aria-label="Закрыть">×</button></div>
-    <div class="modal-body"><ol class="guide-list"><li>Открой адрес приложения в <strong>Safari</strong> на iPhone.</li><li>Нажми кнопку <strong>«Поделиться»</strong> — квадрат со стрелкой вверх.</li><li>Выбери <strong>«На экран Домой»</strong>. Если пункта нет, прокрути список действий вниз.</li><li>Нажми <strong>«Добавить»</strong>. Запускай FitTrack с новой иконки.</li></ol><p class="muted small">Для установки сайт должен быть размещён по HTTPS. Данные сохраняются локально в браузере; не очищай данные сайта без резервной копии.</p></div>
-  </dialog>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="./app.js"></script>
-</body>
-</html>
+function blankState(){return {sessions:[],bodyWeights:[],draft:null};}
+function loadState(){try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));return s&&Array.isArray(s.sessions)?{...blankState(),...s}:blankState()}catch(e){return blankState()}}
+function saveState(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));return true}catch(e){showToast("Не удалось сохранить данные. Проверь свободное место.");return false}}
+function showToast(message){const el=$("#toast");el.textContent=message;el.classList.add("show");clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.classList.remove("show"),2400)}
+function getWorkout(id){return workouts.find(w=>w.id===id)||workouts[0]}
+function allExercises(){const map=new Map();workouts.forEach(w=>w.exercises.forEach(e=>{if(!map.has(e.id))map.set(e.id,e)}));return [...map.values()]}
+function latestWeight(){return [...state.bodyWeights].sort((a,b)=>a.date.localeCompare(b.date)||a.createdAt-b.createdAt).at(-1)}
+function navigate(view){$$(".view").forEach(v=>v.classList.toggle("active",v.id===`view-${view}`));$$(".tab").forEach(t=>t.classList.toggle("active",t.dataset.nav===view));if(view==="home")renderHome();if(view==="history")renderHistory();if(view==="progress")renderProgress();if(view==="profile"){}window.scrollTo({top:0,behavior:"smooth"})}
+function workoutDoneThisWeek(){const now=new Date();const day=(now.getDay()+6)%7;const monday=new Date(now);monday.setDate(now.getDate()-day);monday.setHours(0,0,0,0);return state.sessions.filter(s=>s.completedAt&&new Date(s.completedAt)>=monday).length}
+function nextWorkout(){const last=[...state.sessions].filter(s=>s.completedAt).sort((a,b)=>b.completedAt.localeCompare(a.completedAt))[0];if(!last)return workouts[0];const index=workouts.findIndex(w=>w.id===last.workoutId);return workouts[(index+1+workouts.length)%workouts.length]}
+function renderHome(){const next=nextWorkout();$("#weekCount").textContent=workoutDoneThisWeek();$("#nextDayTag").textContent=next.day;$("#nextWorkoutTitle").textContent=next.title;$("#nextWorkoutSubtitle").textContent=`${next.subtitle} · ${next.exercises.length} упражнений`;$("#totalWorkouts").textContent=state.sessions.filter(s=>s.completedAt).length;const lw=latestWeight();$("#latestBodyWeight").textContent=lw?`${Number(lw.weight).toLocaleString("ru-RU",{maximumFractionDigits:1})} кг`:"—";const weights=[...state.bodyWeights].sort((a,b)=>a.date.localeCompare(b.date));$("#bodyWeightChange").textContent=weights.length>1?`${(weights.at(-1).weight-weights[0].weight)>0?"+":""}${(weights.at(-1).weight-weights[0].weight).toFixed(1)} кг за период`:"добавь первое измерение";$("#homeWorkoutList").innerHTML=workouts.map(w=>`<button class="workout-card" data-start="${w.id}"><span class="workout-letter">${w.id}</span><span class="workout-card-copy"><strong>${w.title} · ${w.day.toLowerCase()}</strong><span>${w.subtitle} · ${w.exercises.length} упражнений</span></span><span class="workout-arrow">›</span></button>`).join("");$$("[data-start]").forEach(b=>b.addEventListener("click",()=>startWorkout(b.dataset.start)))}
+function startWorkout(id){activeWorkoutId=id;const workout=getWorkout(id);const draft=state.draft&&state.draft.workoutId===id?state.draft:null;activeSession=draft?draft:{id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),workoutId:id,date:todayISO(),startedAt:new Date().toISOString(),completedAt:null,exercises:workout.exercises.map(e=>({exerciseId:e.id,name:e.name,sets:Array.from({length:e.sets},()=>({weight:"",reps:"",done:false}))}))};$("#activeWorkoutDay").textContent=workout.day;$("#activeWorkoutTitle").textContent=workout.title;renderActiveWorkout();navigate("workout")}
+function renderActiveWorkout(){if(!activeSession)return;const workout=getWorkout(activeWorkoutId);const done=activeSession.exercises.reduce((n,e)=>n+e.sets.filter(s=>s.done).length,0);const total=activeSession.exercises.reduce((n,e)=>n+e.sets.length,0);$("#exerciseCounter").textContent=`${done} / ${total}`;$("#workoutProgressBar").style.width=`${total?done/total*100:0}%`;$("#activeExerciseList").innerHTML=activeSession.exercises.map((sessionEx,ei)=>{const template=workout.exercises.find(e=>e.id===sessionEx.exerciseId)||workout.exercises[ei];return `<article class="exercise-card ${sessionEx.sets.every(s=>s.done)?"done":""}">${template.image?`<img class="exercise-thumb" src="images/${escapeHTML(template.image)}" alt="Техника: ${escapeHTML(template.name)}" loading="lazy">`:""}<div class="exercise-title-row"><div class="exercise-title-copy"><h3>${escapeHTML(sessionEx.name)}</h3><p class="muted">${template.reps} повторений · ${template.rest} сек отдыха</p></div><button class="tech-button" data-tech="${ei}">Техника</button></div><div class="set-header"><span>№</span><span>Вес, кг</span><span>Повторы</span><span>✓</span></div>${sessionEx.sets.map((s,si)=>`<div class="set-row"><span class="set-number">${si+1}</span><input class="number-input set-weight" type="number" min="0" step="0.5" inputmode="decimal" placeholder="—" aria-label="Вес, подход ${si+1}" value="${escapeHTML(s.weight)}" data-ei="${ei}" data-si="${si}" data-field="weight"><input class="number-input set-reps" type="number" min="0" max="100" step="1" inputmode="numeric" placeholder="${template.reps.split("–")[0]}" aria-label="Повторы, подход ${si+1}" value="${escapeHTML(s.reps)}" data-ei="${ei}" data-si="${si}" data-field="reps"><button class="set-check ${s.done?"checked":""}" data-check="${ei}:${si}" aria-label="${s.done?"Отменить подход":"Отметить подход"}">${s.done?"✓":"✓"}</button></div>`).join("")}<div class="exercise-footer"><button class="mini-button accent" data-addset="${ei}">＋ Добавить подход</button><button class="mini-button" data-rest="${ei}">⏱ Отдых</button></div></article>`}).join("");$$("[data-tech]").forEach(b=>b.addEventListener("click",()=>showTechnique(Number(b.dataset.tech))));$$("[data-check]").forEach(b=>b.addEventListener("click",()=>toggleSet(b.dataset.check)));$$("[data-addset]").forEach(b=>b.addEventListener("click",()=>addSet(Number(b.dataset.addset))));$$("[data-rest]").forEach(b=>b.addEventListener("click",()=>openTimer(workout.exercises[Number(b.dataset.rest)].rest)));$$(".set-weight,.set-reps").forEach(input=>input.addEventListener("change",()=>{const {ei,si,field}=input.dataset;activeSession.exercises[+ei].sets[+si][field]=input.value;persistDraft()}));persistDraft()}
+function persistDraft(){state.draft=activeSession;saveState()}
+function toggleSet(key){const [ei,si]=key.split(":").map(Number);const set=activeSession.exercises[ei].sets[si];set.done=!set.done;if(set.done){const ex=getWorkout(activeWorkoutId).exercises[ei];openTimer(ex.rest)}renderActiveWorkout()}
+function addSet(ei){activeSession.exercises[ei].sets.push({weight:"",reps:"",done:false});renderActiveWorkout();showToast("Подход добавлен")}
+function showTechnique(ei){const exSession=activeSession.exercises[ei];const ex=getWorkout(activeWorkoutId).exercises.find(e=>e.id===exSession.exerciseId)||getWorkout(activeWorkoutId).exercises[ei];$("#dialogExerciseTitle").textContent=ex.name;$("#dialogExerciseBody").innerHTML=`${ex.image?`<img class="tech-image" src="images/${escapeHTML(ex.image)}" alt="Фотография техники: ${escapeHTML(ex.name)}">`:""}<p class="muted">${escapeHTML(ex.muscles)}</p><h3>Техника выполнения</h3><p>${escapeHTML(ex.tech)}</p><div class="panel"><p><strong>План:</strong> ${ex.sets} подхода по ${ex.reps} повторений.</p>${ex.startWeight?`<p><strong>Стартовый ориентир:</strong> ${escapeHTML(ex.startWeight)}</p>`:""}<p class="muted small">Это ориентир, а не обязательный вес. Начинай с лёгкой нагрузки, оставляй 3–4 повтора в запасе и не выполняй упражнение через боль.</p></div>`;$("#exerciseDialog").showModal()}
+function finishWorkout(){if(!activeSession)return;const completed=activeSession.exercises.reduce((n,e)=>n+e.sets.filter(s=>s.done).length,0);if(completed===0){if(!confirm("Ты ещё не отметил ни одного подхода. Всё равно завершить тренировку?"))return}activeSession.completedAt=new Date().toISOString();activeSession.exercises.forEach(e=>e.sets.forEach(s=>{s.weight=Number(s.weight)||0;s.reps=Number(s.reps)||0}));state.sessions.push(activeSession);state.draft=null;saveState();activeSession=null;activeWorkoutId=null;showToast("Тренировка сохранена");navigate("history")}
+function renderHistory(){const sessions=[...state.sessions].filter(s=>s.completedAt).sort((a,b)=>b.completedAt.localeCompare(a.completedAt));$("#historySessions").innerHTML=sessions.length?sessions.map(s=>{const w=getWorkout(s.workoutId);const done=s.exercises.reduce((n,e)=>n+e.sets.filter(x=>x.done).length,0);const volume=s.exercises.reduce((n,e)=>n+e.sets.filter(x=>x.done).reduce((a,x)=>a+(Number(x.weight)||0)*(Number(x.reps)||0),0),0);return `<div class="history-item"><div class="history-item-top"><div><h3>${escapeHTML(w.title)}</h3><p class="muted">${fmtDate(s.date)} · ${w.day.toLowerCase()}</p></div><span class="tag">${done} подходов</span></div><div class="history-summary"><span><strong>${s.exercises.length}</strong> упражнений</span><span><strong>${Math.round(volume).toLocaleString("ru-RU")}</strong> кг·повт. объём*</span></div><div class="history-summary">${s.exercises.filter(e=>e.sets.some(x=>x.done)).map(e=>`<span>${escapeHTML(e.name)}</span>`).join(" · ")}</div></div>`}).join(""):`<div class="empty-state">Здесь появятся завершённые тренировки.<br>Выбери тренировку на главной и отмечай подходы.</div>`;renderWeightHistory()}
+function renderWeightHistory(){$("#historyWeights").innerHTML=state.bodyWeights.length?[...state.bodyWeights].sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt-a.createdAt).map(w=>`<div class="history-item"><div class="history-item-top"><div><h3>${Number(w.weight).toLocaleString("ru-RU",{maximumFractionDigits:1})} кг</h3><p class="muted">${fmtDate(w.date)}</p></div><button class="mini-button" data-delete-weight="${w.id}">Удалить</button></div></div>`).join(""):`<div class="empty-state">Пока нет измерений. Добавь вес во вкладке «Профиль».</div>`;$$("[data-delete-weight]").forEach(b=>b.addEventListener("click",()=>{if(confirm("Удалить это измерение?")){state.bodyWeights=state.bodyWeights.filter(w=>w.id!==b.dataset.deleteWeight);saveState();renderHistory();renderProgress();renderHome()}}))}
+function drawChart(container,items,{valueKey="value",dateKey="date",unit="",empty="Нет данных"}={}){if(!items.length){container.innerHTML=`<div class="empty-state">${empty}</div>`;return}const data=items.map(x=>({date:x[dateKey],value:Number(x[valueKey])})).filter(x=>Number.isFinite(x.value));if(!data.length){container.innerHTML=`<div class="empty-state">${empty}</div>`;return}const W=320,H=160,L=32,R=12,T=15,B=30,innerW=W-L-R,innerH=H-T-B;const vals=data.map(d=>d.value);let min=Math.min(...vals),max=Math.max(...vals);if(min===max){min-=1;max+=1}const pad=(max-min)*.12;min-=pad;max+=pad;const points=data.map((d,i)=>({x:data.length===1?W/2:L+i*innerW/(data.length-1),y:T+(max-d.value)/(max-min)*innerH,d}));const path=points.map((p,i)=>(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)).join(" ");const area=path+` L ${points.at(-1).x} ${T+innerH} L ${points[0].x} ${T+innerH} Z`;const labels=points.length<=5?points:points.filter((p,i)=>i===0||i===points.length-1||i===Math.floor(points.length/2));container.innerHTML=`<svg class="chart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="График прогресса"><defs><linearGradient id="chartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#c5ff4a" stop-opacity=".25"/><stop offset="100%" stop-color="#c5ff4a" stop-opacity="0"/></linearGradient></defs><line x1="${L}" y1="${T+innerH}" x2="${W-R}" y2="${T+innerH}" stroke="#343740"/><line x1="${L}" y1="${T+innerH/2}" x2="${W-R}" y2="${T+innerH/2}" stroke="#2a2c33" stroke-dasharray="3 4"/><path d="${area}" fill="url(#chartFill)"/><path d="${path}" fill="none" stroke="#c5ff4a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>${points.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="#c5ff4a" stroke="#17181d" stroke-width="1.5"><title>${escapeHTML(fmtDate(p.d.date))}: ${p.d.value}${unit}</title></circle>`).join("")}${labels.map(p=>`<text class="chart-label" x="${p.x}" y="${H-8}" text-anchor="middle">${new Date(p.d.date+"T12:00:00").toLocaleDateString("ru-RU",{day:"numeric",month:"short"})}</text>`).join("")}<text class="chart-label" x="0" y="${T+5}">${max.toFixed(1)}${unit}</text><text class="chart-label" x="0" y="${T+innerH}">${Math.max(0,min).toFixed(1)}${unit}</text></svg>`}
+function renderProgress(){const weights=[...state.bodyWeights].sort((a,b)=>a.date.localeCompare(b.date)||a.createdAt-b.createdAt);drawChart($("#bodyWeightChart"),weights,{valueKey:"weight",empty:"Добавь несколько измерений веса, чтобы увидеть график.",unit:" кг"});const select=$("#exerciseHistorySelect");const old=select.value;const exs=allExercises();select.innerHTML=exs.map(e=>`<option value="${e.id}">${escapeHTML(e.name)}</option>`).join("");if(exs.some(e=>e.id===old))select.value=old;renderExerciseChart()}
+function renderExerciseChart(){const id=$("#exerciseHistorySelect").value;const points=[];state.sessions.filter(s=>s.completedAt).sort((a,b)=>a.date.localeCompare(b.date)).forEach(s=>s.exercises.filter(e=>e.exerciseId===id).forEach(e=>{const done=e.sets.filter(x=>x.done&&Number(x.weight)>0);if(done.length)points.push({date:s.date,value:Math.max(...done.map(x=>Number(x.weight)))})}));drawChart($("#exerciseChart"),points,{empty:"Заверши подходы с указанным весом — здесь появится история.",unit:" кг"})}
+function addBodyWeight(value){const weight=Number(value);if(!Number.isFinite(weight)||weight<20||weight>350){showToast("Введи корректный вес от 20 до 350 кг");return false}state.bodyWeights.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),date:todayISO(),weight,createdAt:Date.now()});saveState();$("#bodyWeightInput").value="";$("#weightSaveStatus").textContent=`Сохранено: ${weight.toLocaleString("ru-RU")} кг`;renderHome();renderProgress();renderHistory();showToast("Вес тела сохранён");return true}
+function openTimer(seconds=90){timerSeconds=seconds;timerRemaining=seconds;timerRunning=false;clearInterval(timerInterval);updateTimerDisplay();$("#timerStartPause").textContent="Старт";$$(".timer-presets button").forEach(b=>b.classList.toggle("active",Number(b.dataset.seconds)===seconds));$("#timerDialog").showModal()}
+function updateTimerDisplay(){const m=Math.floor(timerRemaining/60).toString().padStart(2,"0"),s=(timerRemaining%60).toString().padStart(2,"0");$("#timerDisplay").textContent=`${m}:${s}`;document.title=timerRunning?`${m}:${s} · FitTrack`:"FitTrack — тренировки"}
+function stopTimer(){clearInterval(timerInterval);timerRunning=false;$("#timerStartPause").textContent="Старт";updateTimerDisplay()}
+function toggleTimer(){if(timerRunning){stopTimer();return}if(timerRemaining<=0)timerRemaining=timerSeconds;timerRunning=true;$("#timerStartPause").textContent="Пауза";timerInterval=setInterval(()=>{timerRemaining--;updateTimerDisplay();if(timerRemaining<=0){stopTimer();showToast("Отдых окончен — следующий подход");if(navigator.vibrate)navigator.vibrate([180,100,180])}},1000)}
+function setTimer(seconds){timerSeconds=seconds;timerRemaining=seconds;stopTimer();$$(".timer-presets button").forEach(b=>b.classList.toggle("active",Number(b.dataset.seconds)===seconds));updateTimerDisplay()}
+function exportBackup(){const payload={app:"FitTrack",version:1,exportedAt:new Date().toISOString(),data:{sessions:state.sessions,bodyWeights:state.bodyWeights,draft:state.draft}};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`fittrack-backup-${todayISO()}.json`;a.click();URL.revokeObjectURL(url);showToast("Резервная копия подготовлена")}
+async function importBackup(file){try{const parsed=JSON.parse(await file.text());const data=parsed.data||parsed;if(!Array.isArray(data.sessions)||!Array.isArray(data.bodyWeights))throw new Error("Файл не похож на резервную копию FitTrack");if(!confirm("Импорт заменит текущую историю данными из файла. Продолжить?"))return;state={...blankState(),...data};saveState();renderHome();renderHistory();renderProgress();showToast("Резервная копия импортирована")}catch(e){showToast("Не удалось импортировать: проверь файл")}}
+function clearAll(){if(!confirm("Удалить все тренировки, измерения веса и незавершённую тренировку? Это нельзя отменить без резервной копии."))return;state=blankState();activeSession=null;activeWorkoutId=null;saveState();renderHome();renderHistory();renderProgress();showToast("Локальные данные удалены")}
+function openInstallGuide(){$("#installDialog").showModal()}
+function init(){renderHome();renderHistory();renderProgress();$$("[data-nav]").forEach(b=>b.addEventListener("click",()=>{const v=b.dataset.nav;if(v==="workout"&&!activeSession){showToast("Сначала выбери тренировку");navigate("home")}else navigate(v)}));$("#startNext").addEventListener("click",()=>startWorkout(nextWorkout().id));$("#finishWorkout").addEventListener("click",finishWorkout);$("#bodyWeightForm").addEventListener("submit",e=>{e.preventDefault();addBodyWeight($("#bodyWeightInput").value)});$("#exerciseHistorySelect").addEventListener("change",renderExerciseChart);$$("[data-history-tab]").forEach(b=>b.addEventListener("click",()=>{$$("[data-history-tab]").forEach(x=>x.classList.toggle("active",x===b));$("#historySessions").classList.toggle("hidden",b.dataset.historyTab!=="sessions");$("#historyWeights").classList.toggle("hidden",b.dataset.historyTab!=="weights")}));$("#closeExerciseDialog").addEventListener("click",()=>$("#exerciseDialog").close());$("#closeTimer").addEventListener("click",()=>{stopTimer();$("#timerDialog").close()});$("#closeInstall").addEventListener("click",()=>$("#installDialog").close());$("#installHelp").addEventListener("click",openInstallGuide);$("#showInstallGuide").addEventListener("click",openInstallGuide);$("#timerStartPause").addEventListener("click",toggleTimer);$("#timerReset").addEventListener("click",()=>setTimer(timerSeconds));$$("[data-seconds]").forEach(b=>b.addEventListener("click",()=>setTimer(Number(b.dataset.seconds))));$("#exportData").addEventListener("click",exportBackup);$("#importData").addEventListener("change",e=>{if(e.target.files[0])importBackup(e.target.files[0]);e.target.value=""});$("#clearData").addEventListener("click",clearAll);document.addEventListener("visibilitychange",()=>{if(document.hidden&&timerRunning){/* Timer continues while page is active; iOS may suspend background timers. */}});if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+init();
