@@ -1,4 +1,4 @@
-const CACHE_NAME = "fittrack-cache-v8";
+const CACHE_NAME = "fittrack-cache-v9";
 
 const APP_FILES = [
   "./",
@@ -26,7 +26,11 @@ const APP_FILES = [
   "./images/hip-abduction.jpg",
   "./images/biceps-curl-dumbbell.jpg",
   "./images/incline-dumbbell-curl.jpg",
-  "./images/cable-biceps-curl.jpg"
+  "./images/cable-biceps-curl.jpg",
+  "./images/biceps-curl-machine.svg",
+  "./images/cable-biceps-curl.svg",
+  "./images/biceps-curl-dumbbell.svg",
+  "./images/incline-dumbbell-curl.svg"
 ];
 
 self.addEventListener("install", event => {
