@@ -1,26 +1,12 @@
-{
-  "name": "FitTrack — трекер тренировок",
-  "short_name": "FitTrack",
-  "description": "Личный трекер тренировок с историей подходов и прогрессом.",
-  "lang": "ru",
-  "start_url": "./index.html",
-  "scope": "./",
-  "display": "standalone",
-  "background_color": "#101114",
-  "theme_color": "#101114",
-  "orientation": "portrait",
-  "icons": [
-    {
-      "src": "./icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ]
-}
+# FitTrack — исправленная сборка
+
+## Что внутри
+- `index.html`, `styles.css`, `app.js` — приложение
+- `sw.js` — Service Worker с обновлённым кэшем `fittrack-cache-v6`
+- `manifest.webmanifest` — настройки PWA
+
+## Публикация
+Загрузите содержимое архива в корень репозитория `fittrack-pwa` (ветка `main`) с заменой одноимённых файлов. Если в репозитории есть каталог `images`, оставьте его: в этой сборке изображения не обязательны для работы основных функций.
+
+## Важно
+Эта сборка включает A/B/C, отметку подходов, технику, таймер, историю тренировок, вес тела, графики и импорт/экспорт. Данные хранятся локально в браузере. Кэш Service Worker обновлён до `fittrack-cache-v6`.
