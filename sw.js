@@ -1,4 +1,4 @@
-const CACHE_NAME = "fittrack-cache-v11";
+const CACHE_NAME = "fittrack-cache-v12";
 
 const APP_FILES = [
   "./",
@@ -68,33 +68,45 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   const request = event.request;
-
   if (request.method !== "GET") return;
 
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  const isAppShell =
+    request.mode === "navigate" ||
+    /\\/(index\\.html|app\\.js|styles\\.css|sw\\.js)$/.test(url.pathname);
+
   event.respondWith((async () => {
+    if (isAppShell) {
+      try {
+        const response = await fetch(request, { cache: "no-store" });
+        if (response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(request, response.clone());
+        }
+        return response;
+      } catch (error) {
+        const cached = await caches.match(request);
+        if (cached) return cached;
+        if (request.mode === "navigate") {
+          return (await caches.match("./index.html")) || Response.error();
+        }
+        return Response.error();
+      }
+    }
+
     const cached = await caches.match(request);
     if (cached) return cached;
 
     try {
       const response = await fetch(request);
-
-      if (
-        response.ok &&
-        new URL(request.url).origin === self.location.origin
-      ) {
+      if (response.ok) {
         const cache = await caches.open(CACHE_NAME);
         await cache.put(request, response.clone());
       }
-
       return response;
     } catch (error) {
-      if (request.mode === "navigate") {
-        const cache = await caches.open(CACHE_NAME);
-        return (
-          await cache.match("./index.html")
-        ) || Response.error();
-      }
-
       return Response.error();
     }
   })());
